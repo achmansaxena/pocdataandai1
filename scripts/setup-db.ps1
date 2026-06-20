@@ -32,7 +32,7 @@ Write-Host "3. Copying backup file to SQL Server container..."
 docker cp $backupFile ${containerName}:/var/opt/mssql/backup.bak
 
 Write-Host "4. Restoring database inside container..."
-$restoreSql = "RESTORE DATABASE [AdventureWorks2022] FROM DISK = N'/var/opt/mssql/backup.bak' WITH FILE = 1, NOUNLOAD, REPLACE, STATS = 5"
+$restoreSql = "RESTORE DATABASE [AdventureWorks2022] FROM DISK = N'/var/opt/mssql/backup.bak' WITH MOVE 'AdventureWorks2022' TO '/var/opt/mssql/data/AdventureWorks2022.mdf', MOVE 'AdventureWorks2022_log' TO '/var/opt/mssql/data/AdventureWorks2022_log.ldf', FILE = 1, NOUNLOAD, REPLACE, STATS = 5"
 docker exec -it $containerName /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "YourStrong!Passw0rd" -C -Q $restoreSql
 
 Write-Host "✅ Database Setup Complete! AdventureWorks2022 is ready to use."
