@@ -49,7 +49,7 @@ Important Rules:
 
 function cleanSQLQuery(query: string): string {
   const codeBlockMatch = query.match(/```(?:sql)?\n?([\s\S]*?)```/i);
-  let cleaned = codeBlockMatch ? codeBlockMatch[1] : query;
+  const cleaned = codeBlockMatch ? codeBlockMatch[1] : query;
   return cleaned.trim();
 }
 
@@ -83,15 +83,16 @@ T-SQL Query (RETURN ONLY THE T-SQL QUERY. DO NOT INCLUDE MARKDOWN, EXPLANATIONS,
 
   // Phase 2: Execute T-SQL
   const pool = await poolPromise;
-  let rawResults: Record<string, any>[] = [];
+  let rawResults: Record<string, unknown>[] = [];
 
   try {
     const dbResult = await pool.request().query(sqlQuery);
     rawResults = dbResult.recordset;
-  } catch (dbError: any) {
+  } catch (dbError: unknown) {
     console.error("Database execution failed:", sqlQuery, dbError);
+    const msg = dbError instanceof Error ? dbError.message : String(dbError);
     return {
-      answer: `I generated a T-SQL query but encountered an error running it against the database: ${dbError.message}`,
+      answer: `I generated a T-SQL query but encountered an error running it against the database: ${msg}`,
       source: { sql_query: sqlQuery, raw_results: [] }
     };
   }

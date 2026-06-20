@@ -16,8 +16,6 @@ const sqlConfig = {
   }
 };
 
-let poolPromise: Promise<sql.ConnectionPool>;
-
 // In Next.js, it's best practice to reuse the connection pool across API routes
 // especially during hot-reloads in development mode
 const globalForSql = global as unknown as { poolPromise: Promise<sql.ConnectionPool> };
@@ -35,6 +33,5 @@ if (!globalForSql.poolPromise) {
     });
 }
 
-poolPromise = globalForSql.poolPromise;
-
-export { sql, poolPromise };
+export const poolPromise = globalForSql.poolPromise;
+export { sql };
