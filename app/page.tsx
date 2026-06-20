@@ -70,7 +70,7 @@ export default function ChatPage() {
         {
           id: (Date.now() + 1).toString(),
           role: 'assistant',
-          content: \`Error: \${error.message || 'Failed to get a response.'}\`,
+          content: `Error: ${error.message || 'Failed to get a response.'}`,
         },
       ]);
     } finally {
@@ -130,14 +130,14 @@ export default function ChatPage() {
         ) : (
           <div className="flex flex-col space-y-8 pb-4">
             {messages.map((msg) => (
-              <div key={msg.id} className={\`flex \${msg.role === 'user' ? 'justify-end' : 'justify-start'}\`}>
-                <div className={\`flex max-w-[85%] sm:max-w-[75%] \${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}\`}>
-                  <div className={\`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full \${msg.role === 'user' ? 'bg-blue-600 ml-3' : 'bg-gray-100 mr-3 border border-gray-200'}\`}>
+              <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`flex max-w-[85%] sm:max-w-[75%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                  <div className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full ${msg.role === 'user' ? 'bg-blue-600 ml-3' : 'bg-gray-100 mr-3 border border-gray-200'}`}>
                     {msg.role === 'user' ? <User className="w-4 h-4 text-white" /> : <Bot className="w-4 h-4 text-blue-600" />}
                   </div>
                   
-                  <div className={\`flex flex-col \${msg.role === 'user' ? 'items-end' : 'items-start'} space-y-2\`}>
-                    <div className={\`px-4 py-3 rounded-2xl \${msg.role === 'user' ? 'bg-blue-600 text-white rounded-tr-sm shadow-md' : 'bg-white text-gray-800 border border-gray-200 rounded-tl-sm shadow-sm'}\`}>
+                  <div className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'} space-y-2`}>
+                    <div className={`px-4 py-3 rounded-2xl ${msg.role === 'user' ? 'bg-blue-600 text-white rounded-tr-sm shadow-md' : 'bg-white text-gray-800 border border-gray-200 rounded-tl-sm shadow-sm'}`}>
                       <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                     </div>
                     
@@ -240,3 +240,4 @@ function ExplainabilityPanel({ explainability }: { explainability: NonNullable<M
     </div>
   );
 }
+

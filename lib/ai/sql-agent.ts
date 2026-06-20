@@ -91,22 +91,22 @@ T-SQL Query (RETURN ONLY THE T-SQL QUERY. DO NOT INCLUDE MARKDOWN, EXPLANATIONS,
   } catch (dbError: any) {
     console.error("Database execution failed:", sqlQuery, dbError);
     return {
-      answer: \`I generated a T-SQL query but encountered an error running it against the database: \${dbError.message}\`,
+      answer: `I generated a T-SQL query but encountered an error running it against the database: ${dbError.message}`,
       source: { sql_query: sqlQuery, raw_results: [] }
     };
   }
 
   // Phase 3: Generate Natural Language Answer
-  const answerPrompt = \`Task: You are an AI assistant that translates SQL database query results into clear, user-friendly natural language responses.
-Question: \${question}
-T-SQL Query: \${sqlQuery}
-Query Results: \${JSON.stringify(rawResults)}
+  const answerPrompt = `Task: You are an AI assistant that translates SQL database query results into clear, user-friendly natural language responses.
+Question: ${question}
+T-SQL Query: ${sqlQuery}
+Query Results: ${JSON.stringify(rawResults)}
 
 Instructions:
 - Formulate a clean, natural response to the user's question using the provided Query Results.
 - If the query results are empty or null, state clearly that no matching information was found.
 - Keep the answer concise and business-focused.
-- Do not mention technical implementation details like 'SQL query', 'T-SQL', or 'database fields' in the final response.\`;
+- Do not mention technical implementation details like 'SQL query', 'T-SQL', or 'database fields' in the final response.`;
 
   const answerResponse = await openai.chat.completions.create({
     model: modelName,

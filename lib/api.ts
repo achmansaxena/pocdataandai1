@@ -21,7 +21,7 @@ export async function sendChatMessage(question: string): Promise<ChatResponse> {
 
   if (!res.ok) {
     const errorText = await res.text();
-    throw new Error(\`API error \${res.status}: \${errorText}\`);
+    throw new Error(`API error ${res.status}: ${errorText}`);
   }
 
   return res.json() as Promise<ChatResponse>;

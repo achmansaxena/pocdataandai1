@@ -27,7 +27,7 @@ export default function ChatMessage({ message }: Props) {
   const isUser = message.role === "user";
 
   return (
-    <div className={\`flex gap-3 \${isUser ? "justify-end" : "justify-start"} animate-fade-in\`}>
+    <div className={`flex gap-3 ${isUser ? "justify-end" : "justify-start"} animate-fade-in`}>
       {/* Avatar */}
       {!isUser && (
         <div className="flex-shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-900/40">
@@ -35,14 +35,14 @@ export default function ChatMessage({ message }: Props) {
         </div>
       )}
 
-      <div className={\`max-w-[75%] flex flex-col gap-2 \${isUser ? "items-end" : "items-start"}\`}>
+      <div className={`max-w-[75%] flex flex-col gap-2 ${isUser ? "items-end" : "items-start"}`}>
         {/* Bubble */}
         <div
-          className={\`px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-md \${
+          className={`px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-md ${
             isUser
               ? "bg-gradient-to-br from-blue-600 to-indigo-500 text-white rounded-tr-sm"
               : "bg-white/10 backdrop-blur-sm border border-white/10 text-slate-100 rounded-tl-sm"
-          }\`}
+          }`}
         >
           <p className="whitespace-pre-wrap">{message.content}</p>
         </div>
@@ -105,3 +105,4 @@ export default function ChatMessage({ message }: Props) {
     </div>
   );
 }
+
