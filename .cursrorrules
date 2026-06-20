@@ -1,0 +1,26 @@
+# Global AI Assistant Rules
+
+Every time you generate, modify, or review code, you MUST strictly adhere to the following rules without the user needing to explicitly ask:
+
+1. **Codebase Cleanup**: 
+   - Continuously refactor and clean up the code alongside any feature development.
+   - Remove unused imports, dead code, commented-out code snippets, and console logs.
+   - Simplify complex logic where possible.
+
+2. **Strict Best Practices**: 
+   - Strictly follow standard best practices for Next.js, React, and TypeScript.
+   - Use modern paradigms (App Router conventions, Server/Client components properly separated, strict type-checking).
+   - Ensure proper error handling and edge-case management.
+
+3. **Neat & Clean Folder Structure**: 
+   - Always maintain a highly organized and logical folder structure.
+   - Place UI components in appropriate directories (`src/components` or feature-specific component folders).
+   - Separate concerns clearly: models, API routes, hooks, utilities, and features should all be isolated and modular.
+   - Never clutter root or parent directories with utility/helper files.
+
+4. **Code Quality**: 
+   - Write DRY (Don't Repeat Yourself), modular, and readable code. 
+   - Keep components small and focused on a single responsibility.
+   - Add concise, meaningful comments only where the logic is complex.
+
+Treat these rules as the highest priority constraints for every task in this workspace.
