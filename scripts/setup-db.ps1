@@ -14,7 +14,13 @@ if (-not (Test-Path -Path $backupFile)) {
 }
 
 Write-Host "2. Making sure Docker container is running..."
-$containerStatus = docker inspect -f '{{.State.Running}}' $containerName 2>$null
+$containerStatus = "false"
+try {
+    $containerStatus = docker inspect -f '{{.State.Running}}' $containerName 2>$null
+} catch {
+    # Container doesn't exist yet, which is fine
+}
+
 if ($containerStatus -ne "true") {
     Write-Host "Starting Docker containers via docker-compose up -d..."
     docker-compose up -d sqlserver
