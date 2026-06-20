@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Database, Loader2, ChevronDown, ChevronUp, Bot, User, CheckCircle2, AlertCircle, MessageSquare } from 'lucide-react';
+import { Send, Database, Bot, User, MessageSquare, ChevronUp, ChevronDown } from 'lucide-react';
 
 type Message = {
   id: string;
   role: 'user' | 'assistant';
   content: string;
   explainability?: {
-    cypherQuery: string;
+    sqlQuery: string;
     accessedData: any;
   };
 };
@@ -17,8 +17,6 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isSeeding, setIsSeeding] = useState(false);
-  const [seedResult, setSeedResult] = useState<{ success: boolean; message: string } | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -29,25 +27,6 @@ export default function ChatPage() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-
-  const handleSeedData = async () => {
-    setIsSeeding(true);
-    setSeedResult(null);
-    try {
-      const res = await fetch('/api/db/seed');
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setSeedResult({ success: true, message: data.message || 'Database seeded successfully!' });
-      } else {
-        setSeedResult({ success: false, message: data.error || 'Failed to seed database.' });
-      }
-    } catch (error: any) {
-      setSeedResult({ success: false, message: error.message || 'An error occurred while seeding.' });
-    } finally {
-      setIsSeeding(false);
-      setTimeout(() => setSeedResult(null), 5000); // Hide toast after 5s
-    }
-  };
 
   const handleSendMessage = async (textOrEvent?: string | React.FormEvent) => {
     let messageContent = typeof textOrEvent === 'string' ? textOrEvent : input;
@@ -79,7 +58,7 @@ export default function ChatPage() {
         role: 'assistant',
         content: data.answer || 'No response generated.',
         explainability: data.source ? {
-          cypherQuery: data.source.cypher_query,
+          sqlQuery: data.source.sql_query,
           accessedData: data.source.raw_results,
         } : undefined,
       };
@@ -91,7 +70,7 @@ export default function ChatPage() {
         {
           id: (Date.now() + 1).toString(),
           role: 'assistant',
-          content: `Error: ${error.message || 'Failed to get a response.'}`,
+          content: \`Error: \${error.message || 'Failed to get a response.'}\`,
         },
       ]);
     } finally {
@@ -108,41 +87,33 @@ export default function ChatPage() {
             <Database className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-xl font-semibold tracking-tight text-gray-900">Knowledge Graph AI</h1>
-            <p className="text-xs text-gray-500">Agentic POC Interface</p>
+            <h1 className="text-xl font-semibold tracking-tight text-gray-900">SQL Data Assistant</h1>
+            <p className="text-xs text-gray-500">Text-to-SQL powered by LLM</p>
           </div>
         </div>
       </header>
 
       {/* Main Chat Area */}
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 w-full max-w-5xl mx-auto flex flex-col space-y-6">
-        {/* Seed Toast */}
-        {seedResult && (
-          <div className={`flex items-center p-4 mb-4 text-sm rounded-lg border ${seedResult.success ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'} animate-in fade-in slide-in-from-top-4`} role="alert">
-            {seedResult.success ? <CheckCircle2 className="w-5 h-5 mr-3 flex-shrink-0" /> : <AlertCircle className="w-5 h-5 mr-3 flex-shrink-0" />}
-            <span className="font-medium">{seedResult.message}</span>
-          </div>
-        )}
-
         {messages.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center text-center space-y-6">
             <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center border border-gray-200 shadow-xl">
               <Bot className="w-10 h-10 text-blue-600" />
             </div>
             <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-gray-900">Welcome to the AI Knowledge Graph</h2>
+              <h2 className="text-2xl font-bold text-gray-900">Welcome to the SQL Data Assistant</h2>
               <p className="text-gray-500 max-w-md mx-auto">
-                Ask questions about your enterprise data. The AI will navigate the Neo4j graph database to find your answers.
+                Ask questions about your enterprise data. The AI will translate it into T-SQL and query the AdventureWorks database.
               </p>
             </div>
 
             {/* Example Questions */}
             <div className="w-full max-w-2xl grid grid-cols-1 sm:grid-cols-2 gap-3 mt-8">
               {[
-                "Why is Acme Corp at risk of renewal?",
-                "Which customers have open critical support cases?",
-                "List all products owned by Enterprise-tier customers.",
-                "What is the total contract value for Umbrella Ltd?"
+                "What are the top 5 most expensive products?",
+                "How many products are colored Red?",
+                "List 5 customers by their first and last name.",
+                "What is the total due for the order 43659?"
               ].map((suggestion, i) => (
                 <button
                   key={i}
@@ -155,20 +126,18 @@ export default function ChatPage() {
                 </button>
               ))}
             </div>
-
-
           </div>
         ) : (
           <div className="flex flex-col space-y-8 pb-4">
             {messages.map((msg) => (
-              <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`flex max-w-[85%] sm:max-w-[75%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                  <div className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full ${msg.role === 'user' ? 'bg-blue-600 ml-3' : 'bg-gray-100 mr-3 border border-gray-200'}`}>
+              <div key={msg.id} className={\`flex \${msg.role === 'user' ? 'justify-end' : 'justify-start'}\`}>
+                <div className={\`flex max-w-[85%] sm:max-w-[75%] \${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}\`}>
+                  <div className={\`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full \${msg.role === 'user' ? 'bg-blue-600 ml-3' : 'bg-gray-100 mr-3 border border-gray-200'}\`}>
                     {msg.role === 'user' ? <User className="w-4 h-4 text-white" /> : <Bot className="w-4 h-4 text-blue-600" />}
                   </div>
                   
-                  <div className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'} space-y-2`}>
-                    <div className={`px-4 py-3 rounded-2xl ${msg.role === 'user' ? 'bg-blue-600 text-white rounded-tr-sm shadow-md' : 'bg-white text-gray-800 border border-gray-200 rounded-tl-sm shadow-sm'}`}>
+                  <div className={\`flex flex-col \${msg.role === 'user' ? 'items-end' : 'items-start'} space-y-2\`}>
+                    <div className={\`px-4 py-3 rounded-2xl \${msg.role === 'user' ? 'bg-blue-600 text-white rounded-tr-sm shadow-md' : 'bg-white text-gray-800 border border-gray-200 rounded-tl-sm shadow-sm'}\`}>
                       <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                     </div>
                     
@@ -207,7 +176,7 @@ export default function ChatPage() {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask a question about the graph data..."
+              placeholder="Ask a question about the database..."
               className="w-full bg-white border border-gray-300 text-gray-900 rounded-2xl pl-5 pr-14 py-4 focus:outline-none focus:ring-2 focus:ring-blue-600/50 focus:border-blue-500 transition-all shadow-sm"
               disabled={isLoading}
             />
@@ -231,7 +200,7 @@ export default function ChatPage() {
 function ExplainabilityPanel({ explainability }: { explainability: NonNullable<Message['explainability']> }) {
   const [isOpen, setIsOpen] = useState(false);
 
-  if (!explainability.cypherQuery) return null;
+  if (!explainability.sqlQuery) return null;
 
   return (
     <div className="w-full max-w-2xl mt-1 overflow-hidden rounded-xl border border-gray-200 bg-white/80 backdrop-blur-sm transition-all duration-200 shadow-sm">
@@ -240,7 +209,7 @@ function ExplainabilityPanel({ explainability }: { explainability: NonNullable<M
         className="flex items-center justify-between w-full px-4 py-2.5 text-xs font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100/50 transition-colors focus:outline-none"
       >
         <div className="flex items-center">
-          <span className="mr-2">🔍 View Graph Reasoning</span>
+          <span className="mr-2">🔍 View SQL Reasoning</span>
         </div>
         {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
       </button>
@@ -248,17 +217,17 @@ function ExplainabilityPanel({ explainability }: { explainability: NonNullable<M
       {isOpen && (
         <div className="p-4 border-t border-gray-200 bg-gray-50/50 space-y-4 text-sm animate-in slide-in-from-top-2 duration-200">
           <div>
-            <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Generated Cypher Query</div>
+            <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Generated T-SQL Query</div>
             <pre className="p-3 bg-gray-50 rounded-lg border border-gray-200 overflow-x-auto">
               <code className="text-blue-700 font-mono text-xs leading-relaxed">
-                {explainability.cypherQuery}
+                {explainability.sqlQuery}
               </code>
             </pre>
           </div>
 
           {explainability.accessedData && (
             <div>
-              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Raw Accessed Data</div>
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Raw Database Results</div>
               <pre className="p-3 bg-gray-50 rounded-lg border border-gray-200 overflow-x-auto max-h-48">
                 <code className="text-green-700 font-mono text-xs leading-relaxed">
                   {JSON.stringify(explainability.accessedData, null, 2)}
