@@ -13,16 +13,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(result);
 
   } catch (error) {
-    console.error("API Chat execution failed:", error);
-    let errorMessage = error instanceof Error ? error.message : "Internal Server Error";
-    
-    if (errorMessage.includes("429")) {
-      errorMessage = "The AI service is currently experiencing high traffic (Rate Limit Exceeded). Please wait a moment and try again.";
-    }
+    const raw = error instanceof Error ? error.message : "Internal Server Error";
+    const message = raw.includes("429")
+      ? "The AI service is currently experiencing high traffic. Please wait a moment and try again."
+      : raw;
 
-    return NextResponse.json(
-      { error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

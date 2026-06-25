@@ -25,12 +25,12 @@ export async function GET() {
       message: 'Successfully connected to AdventureWorks database',
       data: result.recordset 
     });
-  } catch (error: any) {
-    console.error('AdventureWorks connection failed:', error);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json({ 
       success: false, 
       error: 'Failed to query database', 
-      details: error.message 
+      details: message,
     }, { status: 500 });
   }
 }

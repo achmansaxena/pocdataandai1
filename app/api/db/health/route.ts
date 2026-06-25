@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getNeo4jDriver } from "@/lib/neo4j";
+import { getNeo4jDriver } from "@/lib/graph/neo4j";
 
 export async function GET() {
   const driver = getNeo4jDriver();
@@ -7,7 +7,7 @@ export async function GET() {
 
   try {
     const result = await session.run("MATCH (n) RETURN count(n) as count");
-    const count = result.records[0].get("count").toNumber();
+    const count = result.records[0].get("count") as number;
 
     return NextResponse.json({
       status: "connected",
@@ -15,7 +15,6 @@ export async function GET() {
       seeded: count > 0,
     });
   } catch (error) {
-    console.error("Neo4j health check failed:", error);
     return NextResponse.json(
       {
         status: "error",

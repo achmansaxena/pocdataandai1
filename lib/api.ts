@@ -1,18 +1,13 @@
 /**
- * lib/api.ts – Typed client for Next.js API Routes.
+ * lib/api.ts
+ * Typed HTTP client for all Next.js API routes.
  */
 
-export interface SQLSource {
-  sql_query: string;
-  raw_results: Record<string, unknown>[];
-}
+import type { ChatAPIResponse, GraphAPIResponse } from "@/lib/types";
 
-export interface ChatResponse {
-  answer: string;
-  source: SQLSource;
-}
+export type { ChatAPIResponse, GraphAPIResponse };
 
-export async function sendChatMessage(question: string): Promise<ChatResponse> {
+export async function sendChatMessage(question: string): Promise<ChatAPIResponse> {
   const res = await fetch("/api/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -20,9 +15,35 @@ export async function sendChatMessage(question: string): Promise<ChatResponse> {
   });
 
   if (!res.ok) {
-    const errorText = await res.text();
-    throw new Error(`API error ${res.status}: ${errorText}`);
+    const body = await res.json().catch(() => ({ error: res.statusText }));
+    throw new Error(body.error ?? `API error ${res.status}`);
   }
 
-  return res.json() as Promise<ChatResponse>;
+  return res.json() as Promise<ChatAPIResponse>;
+}
+
+export async function sendGraphMessage(question: string): Promise<GraphAPIResponse> {
+  const res = await fetch("/api/graph/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ question }),
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({ error: res.statusText }));
+    throw new Error(body.error ?? `API error ${res.status}`);
+  }
+
+  return res.json() as Promise<GraphAPIResponse>;
+}
+
+export async function triggerGraphSeed(): Promise<{ seeded: number }> {
+  const res = await fetch("/api/graph/seed", { method: "POST" });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({ error: res.statusText }));
+    throw new Error(body.error ?? `Seed error ${res.status}`);
+  }
+
+  return res.json() as Promise<{ seeded: number }>;
 }

@@ -1,26 +1,47 @@
 # Global AI Assistant Rules
 
-Every time you generate, modify, or review code, you MUST strictly adhere to the following rules without the user needing to explicitly ask:
+Every time you generate, modify, or review code, strictly adhere to the following rules — no exceptions, no need for the user to re-ask.
 
-1. **Codebase Cleanup**: 
-   - Continuously refactor and clean up the code alongside any feature development.
-   - Remove unused imports, dead code, commented-out code snippets, and console logs.
-   - Simplify complex logic where possible.
+---
 
-2. **Strict Best Practices**: 
-   - Strictly follow standard best practices for Next.js, React, and TypeScript.
-   - Use modern paradigms (App Router conventions, Server/Client components properly separated, strict type-checking).
-   - Ensure proper error handling and edge-case management.
+## 1. File Size & Splitting (Critical)
+- **Hard limit: 200 lines per file.** If a file exceeds this, split it immediately.
+- Extract sub-components, hooks, utilities, or constants into separate files before the file grows — don't wait until it's already large.
+- Never dump multiple components, types, or logic blocks into a single file.
+- If adding code will push a file over the limit, refactor first, then add.
 
-3. **Neat & Clean Folder Structure**: 
-   - Always maintain a highly organized and logical folder structure.
-   - Place UI components in appropriate directories (`src/components` or feature-specific component folders).
-   - Separate concerns clearly: models, API routes, hooks, utilities, and features should all be isolated and modular.
-   - Never clutter root or parent directories with utility/helper files.
+## 2. Codebase Cleanup
+- Continuously refactor alongside any feature development — don't defer cleanup.
+- Remove unused imports, dead code, commented-out snippets, and stray `console.log`s.
+- Simplify complex logic wherever a cleaner equivalent exists.
 
-4. **Code Quality**: 
-   - Write DRY (Don't Repeat Yourself), modular, and readable code. 
-   - Keep components small and focused on a single responsibility.
-   - Add concise, meaningful comments only where the logic is complex.
+## 3. Strict Best Practices (Next.js / React / TypeScript)
+- Follow App Router conventions strictly — no mixing of Pages Router patterns.
+- Separate Server and Client components clearly; default to Server unless interactivity requires Client (`"use client"` only where necessary).
+- Enable and respect strict TypeScript — no `any`, no type suppression without a comment explaining why.
+- Always handle errors and edge cases explicitly; never silently swallow errors.
 
-Treat these rules as the highest priority constraints for every task in this workspace.
+## 4. Folder Structure
+- `src/components/` → shared/reusable UI components only.
+- `src/features/<feature>/` → feature-specific components, hooks, and logic (co-located).
+- `src/hooks/` → shared custom hooks.
+- `src/lib/` or `src/utils/` → utilities, helpers, constants.
+- `src/types/` → shared TypeScript types and interfaces.
+- API routes stay inside `src/app/api/`.
+- **Never** place utility/helper files in the root or inside `app/` directly.
+
+## 5. Code Quality
+- Write DRY, modular, single-responsibility code.
+- One component = one file = one clear purpose.
+- Prefer named exports over default exports (easier refactoring, better autocomplete).
+- Add comments only for non-obvious logic — not for self-explanatory code.
+- Avoid prop drilling more than 2 levels deep — use context or state management instead.
+
+## 6. Component Design
+- Keep components purely presentational where possible; lift logic into hooks.
+- Extract repeated JSX blocks (even 2+ times) into a sub-component.
+- Avoid inline styles; use Tailwind classes or CSS modules consistently.
+
+---
+
+Treat these as the highest-priority constraints for every task in this workspace.

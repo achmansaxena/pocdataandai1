@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { poolPromise } from "@/lib/db/sql";
+import type { ChatAPIResponse } from "@/lib/types";
 
 // Provide a simplified subset of the AdventureWorks schema to keep LLM context clean
 const ADVENTUREWORKS_SCHEMA = `
@@ -53,7 +54,7 @@ function cleanSQLQuery(query: string): string {
   return cleaned.trim();
 }
 
-export async function executeTextToSQL(question: string) {
+export async function executeTextToSQL(question: string): Promise<ChatAPIResponse> {
   const apiKey = process.env.LLM_API_KEY;
   const baseURL = process.env.LLM_BASE_URL;
   const modelName = process.env.LLM_MODEL_NAME || "gpt-oss-120b";
@@ -79,8 +80,6 @@ T-SQL Query (RETURN ONLY THE T-SQL QUERY. DO NOT INCLUDE MARKDOWN, EXPLANATIONS,
   const rawSql = sqlResponse.choices[0]?.message?.content || "";
   const sqlQuery = cleanSQLQuery(rawSql);
 
-  console.log("Generated T-SQL Query:", sqlQuery);
-
   // Phase 2: Execute T-SQL
   const pool = await poolPromise;
   let rawResults: Record<string, unknown>[] = [];
@@ -89,7 +88,6 @@ T-SQL Query (RETURN ONLY THE T-SQL QUERY. DO NOT INCLUDE MARKDOWN, EXPLANATIONS,
     const dbResult = await pool.request().query(sqlQuery);
     rawResults = dbResult.recordset;
   } catch (dbError: unknown) {
-    console.error("Database execution failed:", sqlQuery, dbError);
     const msg = dbError instanceof Error ? dbError.message : String(dbError);
     return {
       answer: `I generated a T-SQL query but encountered an error running it against the database: ${msg}`,
