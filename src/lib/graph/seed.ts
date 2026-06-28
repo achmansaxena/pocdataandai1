@@ -7,6 +7,7 @@
 
 import { getNeo4jDriver } from "@/lib/graph/neo4j";
 import { applySchema } from "@/lib/graph/schema";
+import { extractAdventureWorksData } from "@/lib/etl/adventureworks";
 import type {
   CustomerNode,
   ProductNode,
@@ -139,13 +140,28 @@ export async function seedGraph(): Promise<number> {
   const session = driver.session();
   let seededNodes = 0;
 
+  // 1. Extract Real Data from AdventureWorks
+  let awCustomers: any[] = [];
+  let awProducts: any[] = [];
+  try {
+    const awData = await extractAdventureWorksData();
+    awCustomers = awData.customers;
+    awProducts = awData.products;
+    console.log(`Extracted ${awCustomers.length} customers and ${awProducts.length} products from AdventureWorks`);
+  } catch (err) {
+    console.error("Failed to extract AdventureWorks data, proceeding with mock data only.", err);
+  }
+
+  const allCustomers = [...CUSTOMERS, ...awCustomers];
+  const allProducts = [...PRODUCTS, ...awProducts];
+
   try {
     // Nodes
-    for (const c of CUSTOMERS) {
+    for (const c of allCustomers) {
       await session.run(`MERGE (n:Customer {id: $id}) SET n += $props`, { id: c.id, props: c });
       seededNodes++;
     }
-    for (const p of PRODUCTS) {
+    for (const p of allProducts) {
       await session.run(`MERGE (n:Product {id: $id}) SET n += $props`, { id: p.id, props: p });
       seededNodes++;
     }

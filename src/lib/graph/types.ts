@@ -12,7 +12,7 @@ export interface CustomerNode {
   tier: "Enterprise" | "Mid-Market" | "SMB";
   region: string;
   healthScore: number; // 0–100
-  source: "CRM";
+  source: "CRM" | "AdventureWorks SQL";
 }
 
 export interface ProductNode {
@@ -20,7 +20,7 @@ export interface ProductNode {
   name: string;
   category: string;
   version: string;
-  source: "ProductCatalog";
+  source: "ProductCatalog" | "AdventureWorks SQL";
 }
 
 export interface ContractNode {

@@ -7,20 +7,7 @@ import ChatInput from '@/components/ChatInput';
 import SuggestionChip from '@/components/SuggestionChip';
 import { sendGraphMessage } from '@/lib/api';
 import type { Message } from '@/lib/types';
-
-/** The 10 predefined business questions from the POC document. */
-const BUSINESS_QUESTIONS = [
-  "Why is HealthBridge at risk of renewal?",
-  "What products does Acme Corp own?",
-  "Which contracts are expiring soon with high renewal risk?",
-  "What support issues impact renewal outcomes?",
-  "Show me all customers with a health score below 60.",
-  "What is the ARR and churn risk for TechNova Inc?",
-  "Which customers have open P1 or P2 support cases?",
-  "What entitlements are under-utilized (below 40% usage)?",
-  "Who manages HealthBridge and what is their contact?",
-  "List all customers and their contract status.",
-];
+import { BUSINESS_QUESTIONS } from '@/lib/constants/use-cases';
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -115,7 +102,7 @@ export default function ChatPage() {
                 </p>
                 <div className="flex flex-wrap gap-2 justify-center">
                   {BUSINESS_QUESTIONS.map((q, i) => (
-                    <SuggestionChip key={i} text={q} onClick={handleSend} />
+                    <SuggestionChip key={q.id} text={q.question} onClick={handleSend} />
                   ))}
                 </div>
               </div>
